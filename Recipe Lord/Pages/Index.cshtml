@@ -1,0 +1,95 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div>
+    <input type="text" id="recipeSearch"/> <input type="button" value="Go" onclick="search();" />
+</div>
+<div class="row" id="placeholder">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+<script>
+    function bookmarkIt(id)
+    {
+        var x = Number($(id).attr("data-recipe_id"));
+        var complexObject = {
+        Recipe_Id: x
+        
+        };
+        console.log(x);
+        var settings =
+    {
+    "async": true,
+    "url": "/api/recipe",
+    "data": JSON.stringify(complexObject),
+	"method": "POST",
+    "contentType": "application/json; charset=utf-8",
+    "dataType": "json",
+        "success" :
+        function (response)
+        {
+           
+        }
+    }
+        $.ajax(settings);
+    }
+
+    function search()
+    {
+        var searchCriteria = $("#recipeSearch").val();
+        var settings =
+    {
+	//"async": false,
+	//"crossDomain": true,
+	//"url": "https://recipe-puppy.p.rapidapi.com/?p=1&i=" + searchCriteria,
+	//"method": "GET",
+ //       "headers":
+ //       {
+	//	"x-rapidapi-host": "recipe-puppy.p.rapidapi.com",
+	//	"x-rapidapi-key": "757ab54685msh8b730e032316a90p1b80aejsndbb97cae383b"
+ //       },
+
+	"async": true,
+	"crossDomain": true,
+	"url": "https://community-food2fork.p.rapidapi.com/search?q=" + searchCriteria + "&key=6c2e498d199813973b124aa1cf0355f7",
+	"method": "GET",
+	"headers": 
+    {
+		"x-rapidapi-host": "community-food2fork.p.rapidapi.com",
+		"x-rapidapi-key": "757ab54685msh8b730e032316a90p1b80aejsndbb97cae383b"
+	},
+
+        "success" :
+        function (response)
+        {
+            $("#placeholder").html("");
+
+            console.log(response);
+            var x = JSON.parse(response);
+            for (var i = 0; i < x.recipes.length; i++)
+            {
+                console.log(x.recipes[i]);
+                if (x.recipes[i].thumbnail != "")
+                {
+                    $("#placeholder").append("<div class='col-md-1' id='text'><input data-recipe_id='" + x.recipes[i].recipe_id + "' type='checkbox' class='chk' onclick='bookmarkIt(this)' /></div>")
+
+                    $("#placeholder").append("<div class='col-md-3' id='text'>" + x.recipes[i].title + "</div>");
+                    $("#placeholder").append("<div class='col-md-4' id='text'><img class='img-fluid' src='" + x.recipes[i].image_url + "'></div>");
+                    $("#placeholder").append("<div class='col-md-4' id='text'>" + x.recipes[i].source_url + "</div>");
+
+                }
+            }
+        }
+    }
+        $.ajax(settings);
+}
+    
+    </script>
